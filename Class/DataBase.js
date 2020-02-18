@@ -6,6 +6,7 @@ const db = SQLite.openDatabase("Movies.db");
 var db_creation = () => {
     let tr = db.transaction( tx => {
         tx.executeSql("CREATE TABLE IF NOT EXISTS utilisateur(id INTEGER PRIMARY KEY, nom text, prenom text, email text, mdp text);");
+    //    tx.executeSql("CREATE TABLE IF NOTS EXISTS film (id INTEGER PRIMARY KEY ")
     });
     console.log("base crée");
     return tr;
@@ -16,8 +17,8 @@ var db_addUser = (nom, prenom,  email, mdp) => {
     console.log("mdp : " + mdp )
     let nb_existant = null;
     let tr = db.transaction( tx => {
-        tx.executeSql("select count (*) as nb_deja from utilisateur where email = ? and mdp = ?;",
-            [ email, mdp ],
+        tx.executeSql("select count (*) as nb_deja from utilisateur where email = ?;",
+            [ email],
             // succes de exe
             (
                 (_, { rows} ) => {
@@ -71,6 +72,8 @@ var callback_max = (rows, nom, prenom, email, mdp)  => {
     return maxi;
 }
 
+
+
 var trt_add = (id, nom, prenom, email, mdp) => {
     //let id = null;
     
@@ -79,7 +82,10 @@ var trt_add = (id, nom, prenom, email, mdp) => {
     let tr = db.transaction(tx => {
         tx.executeSql("INSERT INTO utilisateur (id, nom, prenom, email, mdp) VALUES ( ?, ?, ?, ?, ?);", 
                         [ id , nom, prenom, email, mdp ], 
-                        () => { console.log("utilisateur " + nom + " cré") },
+                        () => { 
+                                console.log("utilisateur " + nom + " cré")
+                                alert("Inscription réalisée avec succès :)")    
+                            },
                         ()=> { console.log("Erreur lors de l'insert")}
                     ); 
         tx.executeSql("select * from utilisateur;", (_, { rows}) => console.log(JSON.stringify(rows)));
@@ -102,4 +108,42 @@ var db_listeUsers = () => {
     return tx;
 }
 
-export { db_creation, db_addUser };
+var _db_checkUser = (username, password, nav) => {
+    console.log("username : " + username)
+    console.log("password : " + password)
+
+    // check the user 
+    let count = null;
+    let tr = db.transaction( tx => {
+        tx.executeSql("SELECT prenom, nom from utilisateur where email = ? and mdp = ?;", 
+            [username, password],
+            // succes de execute
+            ( 
+                (_, {rows} ) => {
+                    console.log(rows._array)
+                    callback_count(rows, nav) 
+                }
+            ),
+            // error dans execute
+            ()=>{
+                console.log("Erreur dans la requete count");
+            }
+        );
+    })       
+}
+
+
+var callback_count = (rows, nav) => {
+    console.log(rows)
+    let nb = rows.length;
+    console.log("nb des utils : " + nb)
+    
+    if (nb > 0){
+        nav('Welcome', { 'nom':rows._array[0].nom, 'prenom' : rows._array[0].prenom});
+    }
+    else{
+        alert("Utilisateur inconnu :-(");
+    }    
+} 
+
+export { db_creation, db_addUser, _db_checkUser };

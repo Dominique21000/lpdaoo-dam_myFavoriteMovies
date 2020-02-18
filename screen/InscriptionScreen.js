@@ -65,9 +65,12 @@ class InscriptionScreen extends React.Component{
     
                 //on ajout l'utilisateur
                 db_addUser(nom, prenom, email, mdp);
+                //console.log("ad : " + ad);
                 navigate('Home');
                 //db_addUser(nom, prenom, email, mdp);
-
+            }
+            else{
+                navigate('Inscription');
             }
         }
         

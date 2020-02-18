@@ -1,22 +1,35 @@
 import React from 'react';
 import {View, Text, TextInput, StyleSheet} from 'react-native';
 import { Button } from 'react-native-elements';
+import { _db_checkUser } from '../Class/DataBase';
 
 class ConnexionScreen extends React.Component{
     static navigationOptions = {
         title : "Connexion"
     };
 
-    state = {
-        email: "",
-        password: "",
+    constructor(props)
+    {
+        super(props);
+        
+        this.state = {
+            email: "",
+            password: "",
+        }
     }
+    
+    _verifUser () {
+        console.log("email : " + this.state.email);
+        console.log("password : " + this.state.password);
+        _db_checkUser(this.state.email, this.state.password, this.props.navigation.navigate);
+        
+
+    }
+
 
     render(){
         const { navigate} = this.props.navigation;
-
-        const verifSaisie = () => {
-            
+        const verifSaisie = () => {            
         }
 
         return (
@@ -39,7 +52,7 @@ class ConnexionScreen extends React.Component{
                     mode="contained"
                     buttonStyle={styles.btn_connexion} 
                     title="Connexion"  
-                    onPress={ verifSaisie }
+                    onPress={ text => this._verifUser() }
                     
                 />            
                 <Button 
